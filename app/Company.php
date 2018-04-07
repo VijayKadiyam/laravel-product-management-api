@@ -124,4 +124,14 @@ class Company extends Model
   {
     return $this->hasMany(Stock::class);
   }
+
+  /*
+   * A company has many product categories
+   *
+   *@
+   */
+  public function product_categories()
+  {
+    return $this->hasMany(ProductCategory::class);
+  }
 }

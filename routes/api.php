@@ -32,3 +32,6 @@ Route::resource('stock-categories', 'StockCategoriesController');
 
 // Stocks
 Route::resource('/stocks', 'StocksController');
+
+// Product Categories
+Route::resource('/product-categories', 'ProductCategoriesController');
