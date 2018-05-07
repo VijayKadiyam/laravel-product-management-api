@@ -1,5 +1,5 @@
 #!/bin/bash
-yum install -y httpd24 php71 mysql56-server php71-mysqlnd php71-mbstring
+yum install -y httpd24 php71 mysql56-server php71-mysqlnd php71-mbstring php71-gd
 sudo service httpd start
 yum install curl
 curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
