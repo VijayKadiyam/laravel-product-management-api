@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
-/*Models*/
 use App\Stock;
 use App\Company;
+use App\StockCategory;
+use Illuminate\Http\Request;
 
 class StocksController extends Controller
 {
@@ -50,6 +49,9 @@ class StocksController extends Controller
     $stock = new Stock($request->all());
     $stock->store();
 
+    $stockCategory = StockCategory::where('id', '=', $request->stock_category_id)->first();
+    $stockCategory->updateQuantity($request->qty);
+
     return response()->json([
       'data'  =>  $stock->toArray()
     ], 200);  
@@ -74,7 +76,18 @@ class StocksController extends Controller
    */
   public function update(Request $request, Stock $stock)
   {
+    $request->validate([
+      'supplier_id'       =>  'required',
+      'stock_category_id' =>  'required',
+      'price'             =>  'required',
+      'qty'               =>  'required'
+    ]);
+
+    $stockCategory = StockCategory::where('id', '=', $request->stock_category_id)->first();
+    $stockCategory->removeQuantity($stock->qty);
+
     $stock->update($request->all());
+    $stockCategory->updateQuantity($request->qty);
 
     return response()->json([
       'data'  =>$stock->toArray()

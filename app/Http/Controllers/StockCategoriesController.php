@@ -83,4 +83,14 @@ class StockCategoriesController extends Controller
       'data'  =>  $stockCategory->toArray()
     ], 200);
   }
+
+  /*
+   * To refresh the product category quantity
+   *
+   *@
+   */
+  public function refreshQuantity(Request $request, StockCategory $stock_category)
+  {
+    $stock_category->refreshQuantity();
+  }
 }

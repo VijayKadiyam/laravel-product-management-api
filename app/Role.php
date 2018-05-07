@@ -35,4 +35,24 @@ class Role extends Model
 
     return $this;
   }
+
+  /*
+   * A role belongs to many permissions
+   *
+   *@
+   */
+  public function permissions()
+  {
+    return $this->belongsToMany(Permission::class);
+  }
+
+  /*
+   * To give permission to a role
+   *
+   *@
+   */
+  public function givePermission($permissions)
+  {
+    return $this->permissions()->sync($permissions);
+  }
 }

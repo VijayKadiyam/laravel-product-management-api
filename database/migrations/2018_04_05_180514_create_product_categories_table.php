@@ -17,6 +17,8 @@ class CreateProductCategoriesTable extends Migration
             $table->increments('id');
             $table->integer('company_id');
             $table->string('name');
+            $table->string('hsn_code')->nullable();
+            $table->integer('quantity_left')->default(0);
             $table->timestamps();
         });
     }

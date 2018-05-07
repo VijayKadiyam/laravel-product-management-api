@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Company extends Model
 {
   protected $fillable = [
-    'name', 'pan_no', 'gstn_no', 'address', 'state_code', 'acc_name', 'acc_no', 'ifsc_code', 'branch'
+    'name','contact1', 'pan_no', 'gstn_no', 'address', 'state_code', 'acc_name', 'acc_no', 'ifsc_code', 'branch' 
   ]; 
 
   /*
@@ -34,6 +34,16 @@ class Company extends Model
   }
 
   /*
+   * A company has many settings
+   *
+   *@
+   */
+  public function settings()
+  {
+    return $this->hasMany(Setting::class);
+  }
+
+  /*
    * To assign a user
    *
    *@
@@ -52,7 +62,8 @@ class Company extends Model
    */
   public function roles()
   {
-    return $this->hasMany(Role::class);
+    return $this->hasMany(Role::class)
+      ->with('permissions', 'permissions.module');
   }
 
   /*
@@ -92,7 +103,8 @@ class Company extends Model
    */
   public function suppliers()
   {
-    return $this->hasMany(Supplier::class);
+    return $this->hasMany(Supplier::class)
+      ->latest();
   }
 
   /*
@@ -102,7 +114,8 @@ class Company extends Model
    */
   public function customers()
   {
-    return $this->hasMany(Customer::class);
+    return $this->hasMany(Customer::class)
+      ->latest();
   }
 
   /*
@@ -112,7 +125,8 @@ class Company extends Model
    */
   public function stock_categories()
   {
-    return $this->hasMany(StockCategory::class);
+    return $this->hasMany(StockCategory::class)
+      ->with('unit');
   }
 
   /*
@@ -122,7 +136,8 @@ class Company extends Model
    */
   public function stocks()
   {
-    return $this->hasMany(Stock::class);
+    return $this->hasMany(Stock::class)
+      ->with('stock_category', 'supplier');
   }
 
   /*
@@ -132,6 +147,32 @@ class Company extends Model
    */
   public function product_categories()
   {
-    return $this->hasMany(ProductCategory::class);
+    return $this->hasMany(ProductCategory::class)
+      ->with('stock_categories')
+      ->latest();
+  }
+
+  /*
+   * A company has many products
+   *
+   *@
+   */
+  public function products()
+  {
+    return $this->hasMany(Product::class)
+      ->with('product_category')
+      ->latest();
+  }
+
+  /*
+   * A company has many bills
+   *
+   *@
+   */
+  public function billings()
+  {
+    return $this->hasMany(Billing::class)
+      ->with('billing_details', 'billing_taxes', 'billing_discounts', 'customer', 'company')
+      ->latest();
   }
 }

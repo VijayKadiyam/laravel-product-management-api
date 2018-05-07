@@ -2,10 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-
-/*Models*/
+use App\Role;
 use App\User;
+use Illuminate\Http\Request;
 
 class UsersController extends Controller
 {
@@ -38,7 +37,8 @@ class UsersController extends Controller
     $request->validate([
       'name'        => 'required|string|max:255',
       'email'       => 'required|string|email|max:255|unique:users',
-      'password'    => 'required|string|min:6|confirmed' 
+      'password'    => 'required|string|min:6|confirmed',
+      'role_id'     =>  'required'
     ]);
 
     $user = User::store(); 
@@ -55,6 +55,8 @@ class UsersController extends Controller
    */
   public function show(User $user)
   {
+    $user = \Auth::guard('api')->user()->employees()->find($user->id) ? \Auth::guard('api')->user()->employees()->find($user->id) : $user; 
+
     return response()->json([
       'data'  =>  $user->toArray()
     ], 200);
@@ -68,13 +70,33 @@ class UsersController extends Controller
   public function update(Request $request, User $user)
   {
     $request->validate([
-      'name'        => 'required|string|max:255' 
+      'name'        => 'required|string|max:255',
+      'role_id'     =>  'required'
     ]);
 
     $user->update($request->only(['name']));
+    
+    $role = Role::where('id', '=', request()->role_id)->first();
+    $user->assignRole($role); 
 
     return response()->json([
       'data'  =>  $user->toArray()
     ], 200);
+  }
+
+  /*
+   * To assign a role to a user
+   *
+   *@
+   */
+  public function assignroles(Request $request)
+  {
+    $request->validate([
+      'user_id' =>  'required',
+      'roleIds' =>  'required'
+    ]);
+
+    $user = User::find($request->user_id);
+    $user->assignRole($request->roleIds); 
   }
 }

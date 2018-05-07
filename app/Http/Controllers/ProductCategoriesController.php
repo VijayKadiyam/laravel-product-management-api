@@ -44,7 +44,7 @@ class ProductCategoriesController extends Controller
     ]);
 
     $productCategory = new ProductCategory($request->all());
-    $productCategory->store();
+    $productCategory->store(); 
 
     $stockCategories = [];
     if($request->stock_categories) {
@@ -66,8 +66,11 @@ class ProductCategoriesController extends Controller
    */
   public function show(ProductCategory $productCategory)
   {
+    $company = Company::where('id', '=', request()->header('company_id'))->first();
+    // dd($company->product_categories()->find($productCategory->id)->toArray());
+
     return response()->json([
-      'data'  =>  $productCategory->toArray()
+      'data'  =>  $company->product_categories()->find($productCategory->id)->toArray()
     ], 200);
   }
 
@@ -79,15 +82,35 @@ class ProductCategoriesController extends Controller
   public function update(Request $request, ProductCategory $productCategory)
   {
     $request->validate([
-      'name'  =>  'required'
+      'name'  =>  'required' 
     ]);
 
     $productCategory->update($request->all()); 
 
+    $stockCategories = [];
+    if($request->stock_categories) {
+      foreach($request->stock_categories as $stockCategory) { 
+        $category = StockCategory::where('id', '=', $stockCategory['id'])->first();
+        $productCategory->addStockCategory($category, $stockCategory['value']);
+      }
+    } 
+
+    $company = Company::where('id', '=', request()->header('company_id'))->first();
+    // dd($company->product_categories()->find($productCategory)->toArray());
+
     return response()->json([
-      'data'  =>  $productCategory->toArray()
+      'data'  =>  $company->product_categories()->find($productCategory->id)->toArray()
     ], 200);
   }
 
+  /*
+   * To refresh the product category quantity
+   *
+   *@
+   */
+  public function refreshQuantity(Request $request, ProductCategory $product_category)
+  {
+    $product_category->refreshQuantity();
+  }
   
 }

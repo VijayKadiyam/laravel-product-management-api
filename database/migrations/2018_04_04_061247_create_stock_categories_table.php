@@ -18,6 +18,7 @@ class CreateStockCategoriesTable extends Migration
             $table->integer('company_id');
             $table->string('name');
             $table->integer('unit_id');
+            $table->integer('quantity_left')->default(0);
             $table->timestamps();
         });
     }

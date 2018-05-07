@@ -35,4 +35,24 @@ class Stock extends Model
 
     return $this;
   }
+
+  /*
+   * A stock belongs to stock categories
+   *
+   *@
+   */
+  public function stock_category()
+  {
+    return $this->belongsTo(StockCategory::class);
+  }
+
+  /*
+   * A stock belongs to supplier
+   *
+   *@
+   */
+  public function supplier()
+  {
+    return $this->belongsTo(Supplier::class);
+  }
 }

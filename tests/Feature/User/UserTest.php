@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\User;
 
+use App\Role;
+use App\User;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -11,6 +13,17 @@ class UserTest extends TestCase
 {
   use DatabaseTransactions;
 
+  protected $role;
+
+  public function setUp()
+  {
+    parent::setUp();
+
+    $this->role = factory(Role::class)->create([
+      'role'  =>  'user'
+    ]);
+  }
+
   /** @test */
   function user_must_be_logged_in()
   {
@@ -19,7 +32,7 @@ class UserTest extends TestCase
   }
 
   /** @test */
-  function it_requires_name_email_password_and_password_confirmation()
+  function it_requires_name_email_password_password_confirmation_and_roleId()
   {
     $this->json('post', '/api/users', [], $this->headers)
       ->assertStatus(422);
@@ -58,7 +71,8 @@ class UserTest extends TestCase
       'name'  =>  'vijay',
       'email' =>  'vjfrnd@gmail.com',
       'password'  =>  '123456',
-      'password_confirmation'  =>  '123456'
+      'password_confirmation'  =>  '123456',
+      'role_id'   =>  $this->role->id
     ];
 
     $this->assertCount(1, $this->company->users);
@@ -81,9 +95,14 @@ class UserTest extends TestCase
           'name'  =>  'vijay',
           'email' =>  'vjfrnd1@gmail.com' 
         ]
-      ]);
+      ]); 
+
+    $user = User::where('email', '=', 'vjfrnd@gmail.com')->first();
 
     $this->assertCount(2, $this->user->employees);
+
+    $user->refresh();
+    $this->assertCount(1, $user->roles);
 
   }
 
@@ -104,6 +123,8 @@ class UserTest extends TestCase
   /** @test */
   function single_user_fetched_successfully()
   {
+    $this->disableEH();
+    
     $user = factory(\App\User::class)->create([
       'name'  =>  'Vijay',
       'email' =>  'vjfrnd@gmail.com',
@@ -127,12 +148,13 @@ class UserTest extends TestCase
     $user = factory(\App\User::class)->create([
       'name'  =>  'Vijay',
       'email' =>  'vjfrnd@gmail.com',
-      'password'  =>  bcrypt('123456')
+      'password'  =>  bcrypt('123456') 
     ]); 
     $this->user->addAsEmployeeTo($user);
     $user->assignCompany($this->company->id);
 
     $user->name = "Ajay";
+    $user->role_id = $this->role->id;
 
     $this->json('patch', "/api/users/$user->id", $user->toArray(), $this->headers)
       ->assertStatus(200)
@@ -142,5 +164,31 @@ class UserTest extends TestCase
           'email' =>  'vjfrnd@gmail.com',
         ]
       ]);
+
+    $this->assertCount(1, $user->roles);
   }
+
+  /** @test */
+  function assign_role_to_a_user()
+  {
+    $this->disableEH();
+
+    $role = factory(Role::class)->create();
+
+    $payload = [
+      'user_id'       =>  $this->user->id,
+      'roleIds' =>  [
+        0 =>  $role->id
+      ],
+      
+    ];
+
+    $this->json('post', '/api/users/assign-roles', $payload, $this->headers)
+      ->assertStatus(200);
+
+    $this->user->refresh();
+
+    $this->assertCount(1, $this->user->roles);
+  } 
+  
 }

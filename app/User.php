@@ -2,12 +2,14 @@
 
 namespace App;
 
+use App\Role;
+use App\RoleTrait;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
-  use Notifiable;
+  use RoleTrait, Notifiable;
 
   /**
    * The attributes that are mass assignable.
@@ -55,6 +57,9 @@ class User extends Authenticatable
     $user->addAsEmployeeTo(\Auth::guard('api')->user());
     $user->assignCompany(request()->header('company_id'));
 
+    $role = Role::where('id', '=', request()->role_id)->first();
+    $user->assignRole($role); 
+
     return $user;
   }
 
@@ -89,7 +94,8 @@ class User extends Authenticatable
    */
   public function employees()
   {
-    return $this->belongsToMany(User::class, 'employee_user', 'user_id', 'employee_id');
+    return $this->belongsToMany(User::class, 'employee_user', 'user_id', 'employee_id')
+      ->with('roles');
   } 
 
   /*

@@ -59,6 +59,9 @@ class RolesController extends Controller
    */
   public function show(Role $role)
   {
+    $company = Company::where('id', '=', request()->header('company-id'))->first();
+    $role = $company->roles()->find($role->id);
+    
     return response()->json([
       'data'  =>  $role->toArray()
     ], 200);
@@ -80,5 +83,21 @@ class RolesController extends Controller
     return response()->json([
       'data'  =>  $role->toArray()
     ], 200);
+  }
+
+  /*
+   * To assign a permission to a role
+   *
+   *@
+   */
+  public function assignPermissions(Request $request)
+  {
+    $request->validate([
+      'role_id' =>  'required',
+      'permissionIds' =>  'required'
+    ]);
+
+    $role = Role::find($request->role_id);
+    $role->givePermission($request->permissionIds); 
   }
 }

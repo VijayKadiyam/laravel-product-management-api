@@ -16,6 +16,7 @@ class CreateCompaniesTable extends Migration
         Schema::create('companies', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
+            $table->string('contact1');
             $table->string('pan_no');
             $table->string('gstn_no');
             $table->string('address');
@@ -23,7 +24,7 @@ class CreateCompaniesTable extends Migration
             $table->string('acc_name')->nullable();
             $table->string('acc_no')->nullable();
             $table->string('ifsc_code')->nullable();
-            $table->string('branch')->nullable();
+            $table->string('branch')->nullable(); 
             $table->timestamps();
         });
     }

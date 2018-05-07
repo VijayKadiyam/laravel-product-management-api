@@ -26,37 +26,39 @@ class ProductCategoryTest extends TestCase
   }
 
   /** @test */
-  function product_categories_fetched_successfully()
-  {
-    factory(\App\ProductCategory::class)->create([
-      'company_id'  =>  $this->company->id,
-      'name'  =>  'Silicoplast'
-    ]);
+  // function product_categories_fetched_successfully()
+  // {
+  //   factory(\App\ProductCategory::class)->create([
+  //     'company_id'  =>  $this->company->id,
+  //     'name'  =>  'Silicoplast'
+  //   ]);
 
-    $this->json('get', '/api/product-categories', [], $this->headers)
-      ->assertStatus(200)
-      ->assertJson([
-        'data'  =>  [
-          0 =>  [
-            'name'  =>  'Silicoplast'
-          ]
-        ]
-      ]);
-  }
+  //   $this->json('get', '/api/product-categories', [], $this->headers)
+  //     ->assertStatus(200)
+  //     ->assertJson([
+  //       'data'  =>  [
+  //         0 =>  [
+  //           'name'  =>  'Silicoplast'
+  //         ]
+  //       ]
+  //     ]);
+  // }
 
   /** @test */
   function product_category_saved_successfully()
   {
     $this->disableEH();
     $payload = [
-      'name'  =>  'Silicoplast'
+      'name'  =>  'Silicoplast',
+      'hsn_code'  =>  '1234'
     ];
 
     $this->json('post', '/api/product-categories', $payload, $this->headers)
       ->assertStatus(201)
       ->assertJson([
         'data'  =>  [
-          'name'  =>  'Silicoplast'
+          'name'  =>  'Silicoplast',
+          'hsn_code'  =>  '1234'
         ]
       ]); 
   }
@@ -92,22 +94,22 @@ class ProductCategoryTest extends TestCase
   }
 
   /** @test */
-  function product_updated_successfully()
-  {
-    $productCategory = factory(\App\ProductCategory::class)->create([
-      'company_id'  =>  $this->company->id,
-      'name'  =>  'Silicoplast'
-    ]);
-    $productCategory->name = "Silica";
+  // function product_updated_successfully()
+  // {
+  //   $productCategory = factory(\App\ProductCategory::class)->create([
+  //     'company_id'  =>  $this->company->id,
+  //     'name'  =>  'Silicoplast'
+  //   ]);
+  //   $productCategory->name = "Silica";
 
-    $this->json('patch', "/api/product-categories/$productCategory->id", $productCategory->toArray(), $this->headers)
-      ->assertStatus(200)
-      ->assertJson([
-        'data'  =>  [
-          'name'  =>  'Silica'
-        ]
-      ]);
-  }
+  //   $this->json('patch', "/api/product-categories/$productCategory->id", $productCategory->toArray(), $this->headers)
+  //     ->assertStatus(200)
+  //     ->assertJson([
+  //       'data'  =>  [
+  //         'name'  =>  'Silica'
+  //       ]
+  //     ]);
+  // }
 
   /** @test */
   function a_stock_category_can_be_added_to_the_product_category()
@@ -139,6 +141,46 @@ class ProductCategoryTest extends TestCase
   }
 
   /** @test */
+  function product_fetched_successfully_with_stock_categories()
+  {
+    $productCategory = factory(\App\ProductCategory::class)->create([
+      'company_id'  =>  $this->company->id,
+      'name'  =>  'Silicoplast'
+    ]);
+
+    $stockCategory1 = factory(\App\StockCategory::class)->create([
+      'name'        =>  'Fly Ash',
+      'company_id'  =>  $this->company->id
+    ]);
+
+    $stockCategory2 = factory(\App\StockCategory::class)->create([
+      'name'        =>  'Silica',
+      'company_id'  =>  $this->company->id
+    ]);
+
+    $value1 = "20";
+    $value2 = "20";
+
+    $productCategory->addStockCategory($stockCategory1, $value1);
+    $productCategory->addStockCategory($stockCategory2, $value2);
+
+    $this->json('get', '/api/product-categories', [], $this->headers)
+      ->assertStatus(200)
+      ->assertJson([
+        'data'  =>  [
+          0 =>  [
+            'name'  =>  'Silicoplast',
+            'stock_categories'  =>  [
+              0 =>  [
+                'name'  =>  'Fly Ash'
+              ]
+            ]
+          ]
+        ]
+      ]);
+  }
+
+  /** @test */
   function product_added_successfully_with_stock_category()
   { 
     $this->disableEH();
@@ -165,5 +207,61 @@ class ProductCategoryTest extends TestCase
     $this->assertCount(1, $productCategory->stock_categories);
 
     $this->assertEquals('20' , $productCategory->stock_categories[0]->pivot->value);
+  }
+
+  /** @test */
+  function product_updated_successfully_with_stock_category()
+  {
+    $this->disableEH();
+    $stockCategory1 = factory(\App\StockCategory::class)->create([
+      'name'        =>  'Fly Ash',
+      'company_id'  =>  $this->company->id
+    ]); 
+
+    $stockCategory2 = factory(\App\StockCategory::class)->create([
+      'name'        =>  'Cement',
+      'company_id'  =>  $this->company->id
+    ]); 
+
+    $productCategory = factory(\App\ProductCategory::class)->create([
+      'company_id'  =>  $this->company->id,
+      'name'  =>  'Silicoplast'
+    ]);
+
+    $payload = [
+      'id'    =>  $productCategory->id,
+      'name'  =>  'Silicoplast',
+      'hsn_code'  =>  '1345',
+      'stock_categories'  =>  [
+        0 =>   [
+          'id'    =>  $stockCategory1->id,
+          'value' =>  '20'
+        ],
+        1 =>   [
+          'id'    =>  $stockCategory2->id,
+          'value' =>  '30'
+        ],
+      ]
+    ]; 
+
+    $this->json('patch', "/api/product-categories/$productCategory->id", $payload, $this->headers)
+      ->assertStatus(200)
+      ->assertJson([
+        'data'  =>  [ 
+          'name'  =>  'Silicoplast',
+          'hsn_code'  =>  '1345',
+          'stock_categories'  =>  [
+            0 =>  [
+              'name'  =>  'Fly Ash'
+            ],
+            1 =>   [
+              'name'    =>  'Cement',
+              'pivot'   =>  [
+                'value' =>  30
+              ]
+            ],
+          ] 
+        ]
+      ]);
   }
 }

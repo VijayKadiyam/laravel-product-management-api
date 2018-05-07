@@ -29,6 +29,7 @@ class CompanyTest extends TestCase
   {
     $payload = [
       'name'        =>  'name',
+      'contact1'    =>  '23456787654',
       'pan_no'      =>  'pan',
       'gstn_no'     =>  'gstn',
       'address'     =>  'address',
@@ -100,6 +101,7 @@ class CompanyTest extends TestCase
   {
     $payload = [
       'name'        =>  'name',
+      'contact1'    =>  '23456787654',
       'pan_no'      =>  'pan',
       'gstn_no'     =>  'gstn',
       'address'     =>  'address',

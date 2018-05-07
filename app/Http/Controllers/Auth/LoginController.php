@@ -52,6 +52,8 @@ class LoginController extends Controller
       $user = $this->guard()->user();
       $user->generateToken();
 
+      $user->roles = $user->roles;
+
       return response()->json([
         'data'    =>  $user->toArray(),
         'message' =>  'User is logged in successfully'
