@@ -14,14 +14,15 @@
 
   <head>
 
-    <title>OSVL/17-18/{{ $bill->invoice_no }}</title>
+    <title>{{ $settings->bill_format }}{{ $bill->bill_no }}</title>
 
     <!-- Style-->
     <style type="text/css">
       
       body {
         font-family: "Times New Roman", Georgia, Serif;  
-        padding-top: 70px;
+        //padding-top: 70px;
+        font-size: 14px;
       } 
 
       .header {
@@ -93,54 +94,73 @@
     <!-- Bill Heading -->
     <h3 align="center">TAX INVOICE</h3>
 
-    <!-- Basic Details -->
     <div class="wrapper">
+      <table> 
+        <!-- Company Name and Address-->
+        <tr align="center">
+          <td>
+            <b>{{ $bill->company->name }}</b>
+            <br>
+            {{ $bill->company->address }}
+            <br>
+            <b>GSTIN/UIN: </b>{{ $bill->company->gstn_no }}
+            <br>
+            <b>State Code: </b> {{ $bill->company->state_code }}
+            <br>
+            <b>Email ID:</b> {{ $bill->company->email }}
+            <br>
+            <b>Mob No. </b> {{ $bill->company->contact1 }}
+          </td> 
+        </tr>   
+      </table>
+    </div>
+
+    <!-- Basic Details -->
+    <div class="wrapper"> 
 
       <div class="div-inline">
 
-        <table>
+        <table> 
 
-          <!-- Name -->
+          <!-- Consignee Name and Address-->
           <tr>
             <td>
-              <b>Name</b>
-            </td>
-            <td colspan="2">
-              <b>{{ $bill->company->name }}</b>
-            </td>
-          </tr>
+              Consignee
+              <br>
+              <b>{{ $bill->customer->name }}</b>
+              <br>
+              {{ $bill->customer->address }}
+              <br>
+              <b>GSTIN/UIN: </b>{{ $bill->customer->gst_no }}
+              <br>
+              <b>State Code: </b> {{ $bill->customer->state_code }}
+              <br>
+              <b>Email ID:</b> {{ $bill->customer->email }}
+              <br>
+              <b>Mob No. </b>{{ $bill->customer->contact1 }}
+            </td> 
+          </tr>  
 
-          <!-- Address -->
+          <!-- Buyer Name and Address-->
           <tr>
             <td>
-              <b>Address</b>
-            </td>
-            <td colspan="2">
-              {{ $bill->company->address }}
-            </td>
-          </tr>
-
-          <!-- State Code -->
-          <tr> 
-            <td>
-              <b>State Code : </b>
-            </td>
-            <td colspan="2">
-              {{ $bill->company->state_code }}
-            </td>
-          </tr>
-
-          <!-- GSTN No -->
-          <tr>
-            <td>
-              <b>GSTN No.</b>
-            </td>
-            <td colspan="2">
-              {{ $bill->company->gstn_no }}
-            </td>
-          </tr> 
-
-        </table> 
+              Buyer
+              <br>
+              <b>{{ $bill->customer->name }}</b>
+              <br>
+              {{ $bill->customer->address }}
+              <br>
+              <b>GSTIN/UIN: </b>{{ $bill->customer->gst_no }}
+              <br>
+              <b>State Code: </b> {{ $bill->customer->state_code }}
+              <br>
+              <b>Email ID:</b> {{ $bill->customer->email }}
+              <br>
+              <b>Mob No. </b>{{ $bill->customer->contact1 }}
+            </td> 
+          </tr>  
+ 
+        </table>  
         
       </div>
 
@@ -151,137 +171,82 @@
           <!-- Invoice No -->
           <tr>
             <td>
-              <b>Invoice No</b>
+              Invoice No
+              <br>
+              <b>{{ $settings->bill_format }}{{ $bill->bill_no }}</b>
             </td>
-            <td colspan="2">
-              <b>{{ implode('', $matches[0]) }}/17-18/{{ $bill->bill_no }}</b>
-            </td>
-          </tr>
-
-          <!-- Invoice Date -->
-          <tr>
             <td>
-              <b>Invoice Date</b>
-            </td>
-            <td colspan="2">
-              {{ Carbon\Carbon::parse($bill->created_at)->format('d-m-Y') }}  
-            </td>
-          </tr>
-
-          <!-- Dispatch Document No -->
-          <tr>
-            <td>
-              <b>Dispatch Document No.</b>
-            </td>
-            <td colspan="2">
-              {{ $bill->equip_details }}
-            </td>
-          </tr>
-
-          <!-- Dispatched Through -->
-          <tr>
-            <td>
-              <b>Dispatched Through</b>
-            </td>
-            <td colspan="2">
-              {{ $bill->reg_no }}
+              Invoice Date
+              <br>
+              <b>{{ Carbon\Carbon::parse($bill->created_at)->format('d-m-Y') }} </b>
             </td>
           </tr> 
+
+          <tr>
+            <td>
+              Delivery Note
+              <br>
+              <b>{{ $bill->delivery_note }}</b>
+            </td>
+            <td>
+              Delivery Note Date
+              <br>
+              <b>{{ $bill->delivery_note_date }}</b>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              Supplier Reference
+              <br>
+              <b>{{ $bill->supplier_reference }}</b>
+            </td>
+            <td>
+              Terms of payment
+              <br>
+              <b>{{ $bill->terms_of_payment }}</b>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              Buyer order no
+              <br>
+              <b>{{ $bill->buyer_order_no }}</b>
+            </td>
+            <td>
+              Destination
+              <br>
+              <b>{{ $bill->destination }}</b>
+            </td>
+          </tr>
+
+          <tr>
+            <td>
+              Dispatch document no
+              <br>
+              <b>{{ $bill->despatch_document_no }}</b>
+            </td>
+            <td>
+              Dispatch through
+              <br>
+              <b>{{ $bill->despatch_through }}</b>
+            </td>
+          </tr>
+
+          <tr>
+            <td colspan="2">
+              Terms of delivery
+              <br>
+              <b>{{ $bill->terms_of_delivery }}</b>
+            </td> 
+          </tr>
 
         </table>
         
       </div>
 
     </div>  
-
-    <!-- Consignee Details --> 
-    <div class="wrapper">
-
-      <div class="div-inline">
-
-        <table>
-
-          <!-- Name -->
-          <tr>
-            <td>
-              <b>Consignee Name</b>
-            </td>
-            <td colspan="2">
-              <b>{{ $bill->company->name }}</b>
-            </td>
-          </tr>
-
-          <!-- Address -->
-          <tr>
-            <td>
-              <b>Address</b>
-            </td>
-            <td colspan="2">
-              {{ $bill->company->address }}
-            </td>
-          </tr>
-
-          <!-- State Code -->
-          <tr> 
-            <td>
-              <b>State Code : </b>
-            </td>
-            <td colspan="2">
-              {{ $bill->company->state_code }}
-            </td>
-          </tr>
-
-          <!-- GSTN No -->
-          <tr>
-            <td>
-              <b>GSTN No.</b>
-            </td>
-            <td colspan="2">
-              {{ $bill->company->gstn_no }}
-            </td>
-          </tr> 
-
-        </table> 
-        
-      </div>
-
-      <div class="div-inline">
-
-        <table>
-
-          <!-- Delivery Note -->
-          <tr>
-            <td>
-              <b>Delivery Note</b>
-            </td>
-            <td colspan="2">
-              {{ $bill->log_sheet_no }}
-            </td>
-          </tr>
-
-          <!-- Delivery Note Date -->
-          <tr>
-            <td>
-              <b>Delivery Note Date</b>
-            </td>
-            <td colspan="2"> 
-            </td>
-          </tr>
-
-          <!-- Mode/Terms of payment -->
-          <tr>
-            <td>
-              <b>Mode/Terms of payment</b>
-            </td>
-            <td colspan="2"> 
-            </td>
-          </tr>
-
-        </table>
-        
-      </div>
-
-    </div> 
 
     <!-- Charges Details -->
     <h4><u>Bill Description as follows:</u></h4>
@@ -297,8 +262,14 @@
             <b>Description of Goods</b>
           </td>
           <td>
+            <b>HSN Code</b>
+          </td>
+          <td>
             <b>Quantity</b>
           </td> 
+          <td>
+            <b>Rate per Bag</b>
+          </td>
           <td>
             <b>Amount</b>
           </td>
@@ -318,9 +289,19 @@
               {{ $billing_detail->product_category->name }}
             </td>
 
+            <!-- HSN Code -->
+            <td>
+              {{ $billing_detail->product_category->hsn_code }}
+            </td>
+
             <!-- Quantity -->
             <td>
-              {{ $billing_detail->qty }}
+              {{ $billing_detail->qty }} Bags
+            </td>
+
+            <!-- Cose per unit -->
+            <td>
+              Rs. {{ number_format($billing_detail->cost_per_unit) }}
             </td>
 
             <!-- Amount -->
@@ -339,12 +320,15 @@
           <td colspan="3">
           </td> 
 
+          <td></td>
+          <td></td>
+
           <!-- Amount -->
-          <td>
-            <b>Amount</b>
+          <td align="right">
+            <b>Amount: </b>
           </td>
           <td align="center">
-            {{ number_format( $bill->sub_total ) }}
+            Rs. {{ number_format( $bill->sub_total ) }}
           </td>
 
         </tr>
@@ -356,18 +340,18 @@
           <td>
             <b>GSTN No.</b>
           </td>
-          <td colspan="3">
+          <td colspan="4">
             {{ $bill->company->gstn_no }}
           </td>
 
           <!-- SGST -->
           @foreach($bill->billing_taxes as $billing_tax)
-          <td>
+          <td colspan="2" align="right">
             <b>SGST Tax @ {{ $billing_tax->tax->tax_percent/2 }}%</b>
           </td>
           <td align="center">
             @if($bill->customer->state_code == $bill->company->state_code)
-              {{ number_format( $billing_tax->amount/2 ) }}
+              Rs. {{ number_format( $billing_tax->amount/2 ) }}
             @endif
           </td>
           @endforeach
@@ -381,18 +365,18 @@
           <td>
             <b>PAN No.</b>
           </td>
-          <td colspan="3">
+          <td colspan="4">
             {{ $bill->company->pan_no }}
           </td>
 
           <!-- CGST -->
           @foreach($bill->billing_taxes as $billing_tax)
-          <td>
+          <td colspan="2" align="right">
             <b>CGST Tax @ {{ $billing_tax->tax->tax_percent/2 }}%</b>
           </td>
           <td align="center">
             @if($bill->customer->state_code == $bill->company->state_code)
-              {{ number_format( $billing_tax->amount/2 ) }}
+              Rs. {{ number_format( $billing_tax->amount/2 ) }}
             @endif
           </td>
           @endforeach
@@ -406,17 +390,17 @@
           <td rowspan="2">
             <b>Amount in words</b>
           </td>
-          <td colspan="3" rowspan="2"> 
+          <td colspan="4" rowspan="2"> 
           </td>
 
           <!-- IGST -->
           @foreach($bill->billing_taxes as $billing_tax)
-          <td>
+          <td colspan="2" align="right">
             <b>IGST Tax @ 18%</b>
           </td>
           <td align="center">
             @if($bill->customer->state_code != $bill->company->state_code)
-              {{ number_format( $billing_tax->amount ) }}
+              Rs. {{ number_format( $billing_tax->amount ) }}
             @endif
           </td>
           @endforeach
@@ -426,7 +410,7 @@
         <tr>
 
           <!-- Grand Total -->
-          <td>
+          <td colspan="2" align="right">
             <b>Grand Total</b>
           </td>
           <td align="center">
@@ -435,7 +419,7 @@
               <?php $total_tax += $billing_tax->amount ?>
             @endforeach
             <?php $total = $bill->sub_total + $total_tax ?>
-            {{ number_format( $total ) }}
+            Rs. {{ number_format( $total ) }}
           </td>
 
         </tr>

@@ -95,21 +95,29 @@
 
     <h3 align="right">Mobile No. : { Insert this filed in companies table }</h3>
 
-    <!-- Basic Details -->
     <div class="wrapper">
+      <table> 
+        <!-- Company Name and Address-->
+        <tr align="center">
+          <td>
+            <b>{{ $bill->company->name }}</b>
+            <br>
+            {{ $bill->company->address }}
+            <br>
+            <b>GSTIN/UIN: </b>{{ $bill->company->gstn_no }}
+            <br>
+            <b>State Code: </b> {{ $bill->company->state_code }}
+            <br>
+            <b>Email ID:</b> {{ $bill->company->email }}
+            <br>
+            <b>Mob No. </b> {{ $bill->company->contact1 }}
+          </td> 
+        </tr>   
+      </table>
+    </div>
 
-      <div>
-
-        <table>
-
-          <tr align="center">
-            <td>
-              <h3>{{ $bill->company->name }}</h3>
-              {{ $bill->company->address }}
-            </td>
-          </tr>
-
-        </table>
+    <!-- Basic Details -->
+    <div class="wrapper"> 
 
         <table> 
 
@@ -128,7 +136,7 @@
               <b>Challan No.</b>
             </td>
             <td>
-              {{ $bill->bill_no }}
+              {{ $settings->bill_format }}{{ $bill->bill_no }}
             </td>
           </tr> 
 
@@ -148,7 +156,7 @@
               <b>Vehicle No. :</b>
             </td>
             <td>
-              { Add vehicle no. }
+              {{ $bill->despatch_through }}
             </td>
           </tr> 
 

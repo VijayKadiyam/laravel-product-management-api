@@ -54,3 +54,7 @@ Route::get('/billings/{billing_id}/printChallan', 'BillingsController@printChall
 
 // Settings
 Route::resource('settings', 'SettingsController');
+
+// Reports
+Route::get('/customer-ledger', 'ReportsController@customerLedger');
+Route::get('/product-category-report', 'ReportsController@productCategoryReport');

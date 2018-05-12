@@ -22,7 +22,7 @@ class CustomersController extends Controller
    */
   public function index()
   {
-    $company = Company::where('id', '=', request()->header('company_id'))->first();
+    $company = Company::where('id', '=', request()->header('company-id'))->first();
     if($company)
       $customers = $company->customers;
     else

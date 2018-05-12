@@ -27,12 +27,24 @@ class Customer extends Model
    */
   public function store()
   {
-    if(request()->header('company_id')) {
-      $company = Company::find(request()->header('company_id'));
+    if(request()->header('company-id')) {
+      $company = Company::find(request()->header('company-id'));
       if($company)
         $company ? $company->customers()->save($this) : '';
     } 
 
     return $this;
+  }
+
+  /*
+   * A customer has many billings
+   *
+   *@
+   */
+  public function billings()
+  {
+    return $this->hasMany(Billing::class)
+      ->with('billing_details', 'billing_taxes', 'billing_discounts', 'customer', 'company')
+      ->latest(); 
   }
 }

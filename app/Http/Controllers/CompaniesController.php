@@ -72,7 +72,7 @@ class CompaniesController extends Controller
   public function update(Request $request, Company $company)
   {
     $request->validate([
-      'name'        =>  'required',
+      'name'        =>  'required', 
       'pan_no'      =>  'required',
       'gstn_no'     =>  'required',
       'address'     =>  'required',

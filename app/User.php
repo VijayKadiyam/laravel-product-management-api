@@ -55,7 +55,7 @@ class User extends Authenticatable
       'password' => bcrypt(request()->password),
     ]);
     $user->addAsEmployeeTo(\Auth::guard('api')->user());
-    $user->assignCompany(request()->header('company_id'));
+    $user->assignCompany(request()->header('company-id'));
 
     $role = Role::where('id', '=', request()->role_id)->first();
     $user->assignRole($role); 

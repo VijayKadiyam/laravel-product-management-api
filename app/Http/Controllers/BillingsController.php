@@ -4,9 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Billing;
 use App\Company;
+use App\Setting;
 use App\ProductCategory;
-use Barryvdh\DomPDF\Facade as PDF;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade as PDF;
 
 class BillingsController extends Controller
 {
@@ -23,7 +24,7 @@ class BillingsController extends Controller
    */
   public function index()
   {
-    $company = Company::where('id', '=', request()->header('company_id'))->first();
+    $company = Company::where('id', '=', request()->header('company-id'))->first();
     if($company)
       $billings = $company->billings;
     else
@@ -94,7 +95,7 @@ class BillingsController extends Controller
    */
   public function show(Billing $billing)
   {
-    $company = Company::where('id', '=', request()->header('company_id'))->first();
+    $company = Company::where('id', '=', request()->header('company-id'))->first();
     // dd($company->billings()->find($billing->id)->toArray());
 
     return response()->json([
@@ -136,7 +137,7 @@ class BillingsController extends Controller
       }
     } 
 
-    $company = Company::where('id', '=', request()->header('company_id'))->first();
+    $company = Company::where('id', '=', request()->header('company-id'))->first();
 
     return response()->json([
       'data'  =>  $company->billings()->find($billing->id)->toArray()
@@ -151,7 +152,7 @@ class BillingsController extends Controller
   public function getLatestBillNo()
   {
 
-    $latestBill = Billing::where('company_id', '=', request()->header('company_id'))->latest()->first();
+    $latestBill = Billing::where('company_id', '=', request()->header('company-id'))->latest()->first();
 
     return response()->json([
       'data'  =>  $latestBill
@@ -169,7 +170,9 @@ class BillingsController extends Controller
     $company = Company::where('id', '=', $billing->company_id)->first();
     $bill = $company->billings()->find($billing->id); 
 
-    return view('pdfs.bill', compact('bill')); 
+    $settings = Setting::where('company_id', '=', $company->id)->first(); 
+
+    return view('pdfs.bill', compact('bill', 'settings')); 
   }
 
   /*
@@ -183,8 +186,10 @@ class BillingsController extends Controller
     $company = Company::where('id', '=', $billing->company_id)->first();
     $bill = $company->billings()->find($billing->id); 
 
-    $pdf = PDF::loadView('pdfs.bill', compact('bill'));
-    return $pdf->download('17-18/'. $bill->bill_no . '.pdf'); 
+    $settings = Setting::where('company_id', '=', $company->id)->first(); 
+
+    $pdf = PDF::loadView('pdfs.bill', compact('bill', 'settings'));
+    return $pdf->download($settings->bill_format. $bill->bill_no . '.pdf'); 
   }
 
   /*
@@ -198,7 +203,9 @@ class BillingsController extends Controller
     $company = Company::where('id', '=', $billing->company_id)->first();
     $bill = $company->billings()->find($billing->id); 
 
-    return view('pdfs.challan', compact('bill'));  
+    $settings = Setting::where('company_id', '=', $company->id)->first(); 
+
+    return view('pdfs.challan', compact('bill', 'settings'));  
 
     $pdf = PDF::loadView('pdfs.challan', compact('bill'));
     return $pdf->download('17-18/'. $bill->bill_no . '.pdf');

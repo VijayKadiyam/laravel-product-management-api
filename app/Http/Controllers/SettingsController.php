@@ -35,7 +35,7 @@ class SettingsController extends Controller
    */
   public function index()
   {
-    $company = Company::find(request()->header('company_id'));
+    $company = Company::find(request()->header('company-id'));
     if($company) {
       $settings = $company->settings->count() ? $company->settings[0] : '' ;
     } 

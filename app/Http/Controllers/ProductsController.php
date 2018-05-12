@@ -22,7 +22,7 @@ class ProductsController extends Controller
    */
   public function index()
   {
-    $company = Company::where('id', '=', request()->header('company_id'))->first();
+    $company = Company::where('id', '=', request()->header('company-id'))->first();
     if($company)
       $products = $company->products;
     else
@@ -68,7 +68,7 @@ class ProductsController extends Controller
    */
   public function show(Product $product)
   {
-    $company = Company::where('id', '=', request()->header('company_id'))->first();
+    $company = Company::where('id', '=', request()->header('company-id'))->first();
 
     return response()->json([
       'data'  =>  $product->toArray()

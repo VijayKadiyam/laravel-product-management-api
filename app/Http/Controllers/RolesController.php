@@ -22,7 +22,7 @@ class RolesController extends Controller
    */
   public function index()
   {
-    $company = Company::where('id', '=', request()->header('company_id'))->first();
+    $company = Company::where('id', '=', request()->header('company-id'))->first();
     if($company)
       $roles = $company->roles;
     else
@@ -61,6 +61,8 @@ class RolesController extends Controller
   {
     $company = Company::where('id', '=', request()->header('company-id'))->first();
     $role = $company->roles()->find($role->id);
+    if(! $role)
+      $role = $company->roles()->first();
     
     return response()->json([
       'data'  =>  $role->toArray()

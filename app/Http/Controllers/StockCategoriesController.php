@@ -22,7 +22,7 @@ class StockCategoriesController extends Controller
    */
   public function index()
   {
-    $company = Company::where('id', '=', request()->header('company_id'))->first();
+    $company = Company::where('id', '=', request()->header('company-id'))->first();
     if($company)
       $stock_categories = $company->stock_categories;
     else

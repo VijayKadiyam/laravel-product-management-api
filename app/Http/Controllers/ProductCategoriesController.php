@@ -21,7 +21,7 @@ class ProductCategoriesController extends Controller
    */
   public function index()
   {
-    $company = Company::where('id', '=', request()->header('company_id'))->first();
+    $company = Company::where('id', '=', request()->header('company-id'))->first();
     if($company)
       $productCategories = $company->product_categories;
     else
@@ -66,7 +66,7 @@ class ProductCategoriesController extends Controller
    */
   public function show(ProductCategory $productCategory)
   {
-    $company = Company::where('id', '=', request()->header('company_id'))->first();
+    $company = Company::where('id', '=', request()->header('company-id'))->first();
     // dd($company->product_categories()->find($productCategory->id)->toArray());
 
     return response()->json([
@@ -95,7 +95,7 @@ class ProductCategoriesController extends Controller
       }
     } 
 
-    $company = Company::where('id', '=', request()->header('company_id'))->first();
+    $company = Company::where('id', '=', request()->header('company-id'))->first();
     // dd($company->product_categories()->find($productCategory)->toArray());
 
     return response()->json([
