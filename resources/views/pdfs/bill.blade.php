@@ -1,7 +1,7 @@
 <!-- Format Number -->
 <?php 
 
-  $f = new \NumberFormatter("en", \NumberFormatter::SPELLOUT);
+  // $f = new \NumberFormatter("en", \NumberFormatter::SPELLOUT);
 
   // TO get the first letters
   preg_match_all('/\b\w/', $bill->company->name, $matches); 
