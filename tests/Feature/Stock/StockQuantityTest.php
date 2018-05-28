@@ -65,7 +65,9 @@ class StockQuantityTest extends TestCase
       'supplier_id' => $this->supplier->id,
       'stock_category_id' => $this->stockCategory->id,
       'price'  => 200,
-      'qty'    => 10
+      'qty'    => 10,
+      'date'   => 'date',
+      'invoice_no'  =>  'invoice no'
     ];
 
     $this->json('post', '/api/stocks', $payload, $this->headers)

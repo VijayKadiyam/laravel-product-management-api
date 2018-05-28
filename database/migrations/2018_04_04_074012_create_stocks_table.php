@@ -20,6 +20,8 @@ class CreateStocksTable extends Migration
             $table->integer('stock_category_id');
             $table->integer('price');
             $table->integer('qty');
+            $table->string('date');
+            $table->string('invoice_no')->nullable();
             $table->timestamps();
         });
     }

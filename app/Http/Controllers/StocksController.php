@@ -43,7 +43,8 @@ class StocksController extends Controller
       'supplier_id'       =>  'required',
       'stock_category_id' =>  'required',
       'price'             =>  'required',
-      'qty'               =>  'required'
+      'qty'               =>  'required',
+      'date'              =>  'required'
     ]);
 
     $stock = new Stock($request->all());
@@ -80,7 +81,8 @@ class StocksController extends Controller
       'supplier_id'       =>  'required',
       'stock_category_id' =>  'required',
       'price'             =>  'required',
-      'qty'               =>  'required'
+      'qty'               =>  'required',
+      'date'              =>  'required'
     ]);
 
     $stockCategory = StockCategory::where('id', '=', $request->stock_category_id)->first();

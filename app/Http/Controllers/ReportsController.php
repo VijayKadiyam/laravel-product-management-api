@@ -42,7 +42,17 @@ class ReportsController extends Controller
   }
 
   /*
-   * 
+   * To get the stock category report
+   *
+   *@
+   */
+  public function stockCategoryReport(Request $request)
+  {
+    
+  }
+
+  /*
+   * To get the product category report
    *
    *@
    */

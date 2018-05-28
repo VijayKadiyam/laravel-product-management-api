@@ -8,6 +8,8 @@ $factory->define(\App\Stock::class, function (Faker $faker) {
     'supplier_id' =>  factory(\App\Supplier::class)->create()->id,
     'stock_category_id' =>  factory(\App\StockCategory::class)->create()->id,
     'price'  => 200,
-    'qty'    => 10
+    'qty'    => 10,
+    'date'   => 'date',
+    'invoice_no'  =>  'invoice no'
   ];
 });

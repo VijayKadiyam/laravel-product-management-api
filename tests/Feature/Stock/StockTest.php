@@ -34,7 +34,7 @@ class StockTest extends TestCase
   }
 
   /** @test */
-  function it_requires_supplierId_stockCategoryId_price_and_qty()
+  function it_requires_supplierId_stockCategoryId_price_date_and_qty()
   {
     $this->json('post', '/api/stocks', [], $this->headers)
       ->assertStatus(422); 
@@ -68,11 +68,14 @@ class StockTest extends TestCase
   /** @test */
   function stock_saved_successfully()
   {
+    $this->disableEH();
     $payload = [
       'supplier_id' => $this->supplier->id,
       'stock_category_id' => $this->stockCategory->id,
-      'price'  => 200,
-      'qty'    => 10
+      'price'       => 200,
+      'qty'         => 10,
+      'date'        => 'date',
+      'invoice_no'  =>  'invoice no'
     ];
 
     $this->json('post', '/api/stocks', $payload, $this->headers)
@@ -82,7 +85,9 @@ class StockTest extends TestCase
           'supplier_id' => $this->supplier->id,
           'stock_category_id' => $this->stockCategory->id,
           'price'  => 200,
-          'qty'    => 10
+          'qty'    => 10,
+          'date'        => 'date',
+          'invoice_no'  =>  'invoice no'
         ]
       ]);
   }
@@ -122,6 +127,7 @@ class StockTest extends TestCase
       'qty'    => 10
     ]);
     $stock->price = 2000;
+    $stock->date = "date1";
 
     $this->json('patch', "/api/stocks/$stock->id", $stock->toArray(), $this->headers)
       ->assertStatus(200)
@@ -131,7 +137,8 @@ class StockTest extends TestCase
           'supplier_id' => $this->supplier->id,
           'stock_category_id' => $this->stockCategory->id,
           'price'  => 2000,
-          'qty'    => 10
+          'qty'    => 10,
+          'date'   => 'date1'  
         ]
       ]);
   }
