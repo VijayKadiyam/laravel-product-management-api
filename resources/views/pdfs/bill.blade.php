@@ -1,7 +1,7 @@
 <!-- Format Number -->
 <?php 
 
-  // $f = new \NumberFormatter("en", \NumberFormatter::SPELLOUT);
+  $f = new \NumberFormatter("en", \NumberFormatter::SPELLOUT);
 
   // TO get the first letters
   preg_match_all('/\b\w/', $bill->company->name, $matches); 
@@ -94,33 +94,29 @@
     <!-- Bill Heading -->
     <h3 align="center">TAX INVOICE</h3>
 
-    <div class="wrapper">
-      <table> 
-        <!-- Company Name and Address-->
-        <tr align="center">
-          <td>
-            <b>{{ $bill->company->name }}</b>
-            <br>
-            {{ $bill->company->address }}
-            <br>
-            <b>GSTIN/UIN: </b>{{ $bill->company->gstn_no }}
-            <br>
-            <b>State Code: </b> {{ $bill->company->state_code }}
-            <br>
-            <b>Email ID:</b> {{ $bill->company->email }}
-            <br>
-            <b>Mob No. </b> {{ $bill->company->contact1 }}
-          </td> 
-        </tr>   
-      </table>
-    </div>
-
     <!-- Basic Details -->
     <div class="wrapper"> 
 
       <div class="div-inline">
 
         <table> 
+
+          <!-- Company Name and Address-->
+          <tr>
+            <td>
+              <b>{{ $bill->company->name }}</b>
+              <br>
+              {{ $bill->company->address }}
+              <br>
+              <b>GSTIN/UIN: </b>{{ $bill->company->gstn_no }}
+              <br>
+              <b>State Code: </b> {{ $bill->company->state_code }}
+              <br>
+              <b>Email ID:</b> {{ $bill->company->email }}
+              <br>
+              <b>Mob No. </b> {{ $bill->company->contact1 }}
+            </td> 
+          </tr>   
 
           <!-- Consignee Name and Address-->
           <tr>
@@ -144,7 +140,7 @@
           <!-- Buyer Name and Address-->
           <tr>
             <td>
-              Buyer
+              Buyer (if other than consignee)
               <br>
               <b>{{ $bill->customer->name }}</b>
               <br>
@@ -189,48 +185,61 @@
               <b>{{ $bill->delivery_note }}</b>
             </td>
             <td>
-              Delivery Note Date
+              Mode/Terms of payment
               <br>
-              <b>{{ $bill->delivery_note_date }}</b>
-            </td>
+              <b>{{ $bill->terms_of_payment }}</b>
+            </td> 
           </tr>
 
           <tr>
             <td>
-              Supplier Reference
+              Supplier's Ref.
               <br>
               <b>{{ $bill->supplier_reference }}</b>
             </td>
             <td>
-              Terms of payment
+              Other Reference(s)
               <br>
-              <b>{{ $bill->terms_of_payment }}</b>
+              <b></b>
             </td>
           </tr>
 
           <tr>
             <td>
-              Buyer order no
+              Buyer's Order No
               <br>
               <b>{{ $bill->buyer_order_no }}</b>
+            </td>
+            <td>
+              Dated
+              <br>
+              <b></b>
+            </td> 
+          </tr>
+
+          <tr>
+            <td>
+              Dispatch Document No.
+              <br>
+              <b>{{ $bill->despatch_document_no }}</b>
+            </td>
+            <td>
+              Delivery Note Date
+              <br>
+              <b>{{ $bill->delivery_note_date }}</b>
+            </td> 
+          </tr>
+
+          <tr>
+            <td>
+              Dispatch through
+              <br>
+              <b>{{ $bill->despatch_through }}</b>
             </td>
             <td>
               Destination
               <br>
               <b>{{ $bill->destination }}</b>
-            </td>
-          </tr>
-
-          <tr>
-            <td>
-              Dispatch document no
-              <br>
-              <b>{{ $bill->despatch_document_no }}</b>
-            </td>
-            <td>
-              Dispatch through
-              <br>
-              <b>{{ $bill->despatch_through }}</b>
             </td>
           </tr>
 
@@ -249,7 +258,7 @@
     </div>  
 
     <!-- Charges Details -->
-    <h4><u>Bill Description as follows:</u></h4>
+    <!-- <h4><u>Bill Description as follows:</u></h4> -->
     <div class="wrapper">
 
       <table>
@@ -268,7 +277,10 @@
             <b>Quantity</b>
           </td> 
           <td>
-            <b>Rate per Bag</b>
+            <b>Rate</b>
+          </td>
+          <td>
+            <b>per</b>
           </td>
           <td>
             <b>Amount</b>
@@ -296,12 +308,17 @@
 
             <!-- Quantity -->
             <td>
-              {{ $billing_detail->qty }} Bags
+              {{ $billing_detail->qty }} Bag
             </td>
 
             <!-- Cose per unit -->
             <td>
               Rs. {{ number_format($billing_detail->cost_per_unit) }}
+            </td>
+
+            <!-- Rate per bag -->
+            <td>
+              Bags
             </td>
 
             <!-- Amount -->
@@ -312,107 +329,47 @@
         </tr>
         @endforeach  
 
-        <!-- Sub total -->
-        <tr style="border-top-color: black !important">
-          
-          <td>
+        <!-- Tax -->
+        <tr>
+          <td></td>
+          <td colspan="3" align="right" >
+            @if($bill->customer->state_code == $bill->company->state_code)
+              @foreach($bill->billing_taxes as $billing_tax)
+                <b>SGST Tax @ {{ $billing_tax->tax->tax_percent/2 }}%</b>
+                <br>
+                <b>CGST Tax @ {{ $billing_tax->tax->tax_percent/2 }}%</b>
+              @endforeach
+            @else
+              @foreach($bill->billing_taxes as $billing_tax)
+                <b>IGST Tax @ {{ $billing_tax->tax->tax_percent }}%</b>
+              @endforeach
+            @endif
           </td>
-          <td colspan="3">
-          </td> 
-
           <td></td>
           <td></td>
-
-          <!-- Amount -->
-          <td align="right">
-            <b>Amount: </b>
-          </td>
-          <td align="center">
-            Rs. {{ number_format( $bill->sub_total ) }}
-          </td>
-
-        </tr>
-
-        <!-- GSTN Part -->
-        <tr>
-          
-          <!-- GSTN No -->
-          <td>
-            <b>GSTN No.</b>
-          </td>
-          <td colspan="4">
-            {{ $bill->company->gstn_no }}
-          </td>
-
-          <!-- SGST -->
-          @foreach($bill->billing_taxes as $billing_tax)
-          <td colspan="2" align="right">
-            <b>SGST Tax @ {{ $billing_tax->tax->tax_percent/2 }}%</b>
-          </td>
+          <td></td>
+          <td></td>
           <td align="center">
             @if($bill->customer->state_code == $bill->company->state_code)
-              Rs. {{ number_format( $billing_tax->amount/2 ) }}
+              <b>Rs. {{ number_format( $billing_tax->amount/2 ) }}</b>
+              <br>
+              <b>Rs. {{ number_format( $billing_tax->amount/2 ) }}</b>
+            @else
+              <b>Rs. {{ number_format( $billing_tax->amount ) }}</b>
             @endif
           </td>
-          @endforeach
-
         </tr>
 
-        <!-- Pan Part -->
+        <!-- View the total -->
         <tr>
-          
-          <!-- PAN No -->
-          <td>
-            <b>PAN No.</b>
+          <td></td>
+          <td colspan="3" align="right">
+            Total
           </td>
-          <td colspan="4">
-            {{ $bill->company->pan_no }}
-          </td>
-
-          <!-- CGST -->
-          @foreach($bill->billing_taxes as $billing_tax)
-          <td colspan="2" align="right">
-            <b>CGST Tax @ {{ $billing_tax->tax->tax_percent/2 }}%</b>
-          </td>
-          <td align="center">
-            @if($bill->customer->state_code == $bill->company->state_code)
-              Rs. {{ number_format( $billing_tax->amount/2 ) }}
-            @endif
-          </td>
-          @endforeach
-
-        </tr>
-
-        <!-- Amount in words Part -->
-        <tr>
-          
-          <!-- Amount in words -->
-          <td rowspan="2">
-            <b>Amount in words</b>
-          </td>
-          <td colspan="4" rowspan="2"> 
-          </td>
-
-          <!-- IGST -->
-          @foreach($bill->billing_taxes as $billing_tax)
-          <td colspan="2" align="right">
-            <b>IGST Tax @ 18%</b>
-          </td>
-          <td align="center">
-            @if($bill->customer->state_code != $bill->company->state_code)
-              Rs. {{ number_format( $billing_tax->amount ) }}
-            @endif
-          </td>
-          @endforeach
-
-        </tr> 
-
-        <tr>
-
-          <!-- Grand Total -->
-          <td colspan="2" align="right">
-            <b>Grand Total</b>
-          </td>
+          <td></td>
+          <td></td>
+          <td></td>
+          <td></td>
           <td align="center">
             <?php $total_tax = 0; ?>
             @foreach($bill->billing_taxes as $billing_tax)
@@ -421,48 +378,103 @@
             <?php $total = $bill->sub_total + $total_tax ?>
             Rs. {{ number_format( $total ) }}
           </td>
-
         </tr>
 
+        <!-- Amount in words -->
+        <tr>
+          <td colspan="9">
+            Amount Chargeable (in words)
+            <br>
+            <b>{Total amount in words}</b>
+          </td>
+        </tr>
 
-      </table>
-      
-    </div> 
-
-    <!-- Account Details  -->
-    <div class="wrapper">
-
-      <table>
-          
+        <!-- Taxable amount -->
         <tr align="center">
-          <td>
-            <b>Account Details</b>
+          <td colspan="5">
+            HSN/SAC
           </td>
           <td>
-            <b>Name :</b>
-            <br>
-            {{ $bill->company->acc_name }}
+            Taxable Value
           </td>
           <td>
-            <b>A/C No. :</b>
-            <br>
-            {{ $bill->company->acc_no }}
+            Rate
           </td>
           <td>
-            <b>IFSC Code :</b>
-            <br>
-            {{ $bill->company->ifsc }}
+            Amount
           </td>
           <td>
-            <b>Branch :</b>
-            <br>
-            {{ $bill->company->branch }}
+            Total Tax Amount
           </td>
         </tr>
 
+        <!-- Billing details -->
+        <?php
+          $total_taxable = 0;
+          $total_tax = 0;
+        ?>
+        @foreach($bill->billing_details as $billing_detail)
+        <tr align="center">  
+
+          <!-- HSN Code -->
+          <td colspan="5">
+            {{ $billing_detail->product_category->hsn_code }}
+          </td> 
+
+          <!-- Taxable Amount -->
+          <td>
+            <?php  
+              $total_taxable += $billing_detail->amount;
+            ?>
+            Rs. {{ number_format($billing_detail->amount) }}
+          </td>
+
+          <!-- Rate -->
+          <td>
+             {{ $billing_tax->tax->tax_percent }} %
+          </td>
+
+          <!-- Tax amount -->
+          <td>
+            <?php 
+              $tax = $billing_detail->amount * $billing_tax->tax->tax_percent / 100;
+              $total_tax += $tax;
+            ?>
+            Rs. {{ number_format( $tax ) }}
+          </td>
+
+          <!-- Total tax amount -->
+          <td> 
+            Rs. {{ number_format( $tax ) }}
+          </td>
+
+        </tr>
+        @endforeach  
+
+        <tr>
+          <td colspan="5" align="right">
+            <b>Total</b>
+          </td>
+          <td align="center">
+            <b>Rs. {{ number_format($total_taxable) }}</b>
+          </td>
+          <td></td>
+          <td></td>
+          <td align="center">
+            <b>Rs. {{ number_format($total_tax) }}</b>
+          </td>
+        </tr>
+
+        <!-- Total tax amount -->
+        <tr>
+          <td colspan="9">
+            Tax Chargeable (in words) : <b>{Tax amount in words}</b> 
+          </td>
+        </tr> 
+
       </table>
       
-    </div> 
+    </div>  
 
     <!-- Terms -->
     <div class="wrapper">
@@ -473,12 +485,11 @@
           
           <td>
 
-            <b>Terms and Conditions </b> 
+            <b>Declaration </b> 
             <br>
+            We declare that this invoice shows the actual price of the goods described & that all particukars are true and correct
 
-            1. Interest @ 18% p.a. will be charged if this payment is not paid within 15 days after submission.
-            <br>
-            2. Error and submission in this invoice shall be subject to the jurisdication of Panvel
+            1) Goods once sold will not taken back in any case. 2) We are not responsibe for breakage, leakage, shortage or loss in transit as goods are delivered carefully checked, packed & delivered. 3) No complaint if any will be entertained after 3 days from received. 4) Subject to Ankleshwar Jurisdiction. 5) Interest 24% will be charged for all unpaid bills after due date. 6) If any change in Tax rate due to HSN Code Change than accordingly tax amount will be refunded/ recovered. 
 
           </td>
 
