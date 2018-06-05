@@ -313,7 +313,7 @@
 
             <!-- Cose per unit -->
             <td>
-              Rs. {{ number_format($billing_detail->cost_per_unit) }}
+              Rs. {{ $billing_detail->amount / $billing_detail->qty }}
             </td>
 
             <!-- Rate per bag -->

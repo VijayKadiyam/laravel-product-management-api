@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Stock;
 use App\Company;
 use App\Product;
 use App\Setting;
@@ -48,7 +49,48 @@ class ReportsController extends Controller
    */
   public function stockCategoryReport(Request $request)
   {
-    
+    $company = Company::where('id', '=', request()->company_id)->first();
+    $stock_category = $company->stock_categories()->find($request->stock_category_id);
+
+    $fromDate = '';
+    $toDate = '';
+    if($request->fromDate) {
+      $fromDate = new Carbon($request->fromDate);
+    } 
+    else {
+      return "Please select from date";
+    }
+
+    if($request->toDate)
+      $toDate = (new Carbon($request->toDate));  
+    else {
+      return "Please select to date";
+    }
+
+    $data = [];
+    $keys = [
+      'Date', 'Supplier Name', 'Invoice No', 'Qty'
+    ];
+    while($fromDate <= $toDate) {
+      $stocks = Stock::where('date', '=', $fromDate->format('d-m-Y'))
+        ->where('stock_category_id', '=', $request->stock_category_id)
+        ->with('supplier')
+        ->get();
+
+      $temp = [];
+      foreach($stocks as $stock) {
+        $temp['date'] = $stock->date;
+        $temp['supplier_name'] = $stock->supplier->name;
+        $temp['invoice_no'] = $stock->invoice_no;
+        $temp['qty'] = $stock->qty;
+      }
+      array_push($data, $temp);
+      $fromDate->addDays(1);
+    }
+    // $keys = array_keys($temp);
+
+    return view('reports.stock-report', compact('data', 'keys', 'stock_category', 'fromDate', 'toDate'));
+
   }
 
   /*
