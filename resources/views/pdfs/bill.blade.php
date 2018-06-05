@@ -351,11 +351,15 @@
           <td></td>
           <td align="center">
             @if($bill->customer->state_code == $bill->company->state_code)
-              <b>Rs. {{ number_format( $billing_tax->amount/2 ) }}</b>
-              <br>
-              <b>Rs. {{ number_format( $billing_tax->amount/2 ) }}</b>
+              @foreach($bill->billing_taxes as $billing_tax)
+                <b>{{ number_format($billing_tax->amount/2) }}%</b>
+                <br>
+                <b>{{ number_format($billing_tax->amount/2) }}%</b>
+              @endforeach
             @else
-              <b>Rs. {{ number_format( $billing_tax->amount ) }}</b>
+              @foreach($bill->billing_taxes as $billing_tax)
+                <b>{{ number_format( $billing_tax->amount ) }}%</b>
+              @endforeach
             @endif
           </td>
         </tr>
@@ -431,14 +435,19 @@
 
           <!-- Rate -->
           <td>
+            @foreach($bill->billing_taxes as $billing_tax)
              {{ $billing_tax->tax->tax_percent }} %
+            @endforeach
           </td>
 
           <!-- Tax amount -->
           <td>
             <?php 
-              $tax = $billing_detail->amount * $billing_tax->tax->tax_percent / 100;
-              $total_tax += $tax;
+              $tax = 0;
+              foreach($bill->billing_taxes as $billing_tax) {
+                $tax = $billing_detail->amount * $billing_tax->tax->tax_percent / 100;
+                $total_tax += $tax;
+              }
             ?>
             Rs. {{ number_format( $tax ) }}
           </td>
