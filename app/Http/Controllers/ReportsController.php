@@ -90,7 +90,7 @@ class ReportsController extends Controller
       }
 
       if(count($stocks) == 0) {
-        $temp['date'] = 0;
+        $temp['date'] = $fromDate;
         $temp['supplier_name'] = 0;
         $temp['invoice_no'] = 0;
         $temp['qty'] = 0;
