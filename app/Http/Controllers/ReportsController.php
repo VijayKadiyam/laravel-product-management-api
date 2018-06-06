@@ -53,6 +53,8 @@ class ReportsController extends Controller
     $company = Company::where('id', '=', request()->company_id)->first();
     $stock_category = $company->stock_categories()->find($request->stock_category_id);
 
+    // dd($stock_category);
+
     $fromDate = '';
     $toDate = '';
     if($request->fromDate) {
@@ -108,13 +110,13 @@ class ReportsController extends Controller
           $qty += $product->qty;
         }
 
-        foreach($product_category->stock_categories as $stock_category) {
-          if($stock_category->id == $request->stock_category_id) { 
+        foreach($product_category->stock_categories as $stock_category1) {
+          if($stock_category1->id == $request->stock_category_id) { 
             if(!in_array($product_category->name . ' Qty. Manu. (in Kgs)' , $keys)) {
               array_push($keys, $product_category->name . ' Qty. Manu. (in Kgs)');
             }
-            $temp[$product_category->name . ' Qty. Manu.'] = $stock_category->pivot->value * $qty;
-            $balance -= $stock_category->pivot->value * $qty; 
+            $temp[$product_category->name . ' Qty. Manu.'] = $stock_category1->pivot->value * $qty;
+            $balance -= $stock_category1->pivot->value * $qty; 
             // dd($stock_category->pivot->value * $qty);
           }
         }
