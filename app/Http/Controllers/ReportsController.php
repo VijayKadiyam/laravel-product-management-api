@@ -88,7 +88,7 @@ class ReportsController extends Controller
         $temp['supplier_name'] = $stock->supplier->name;
         $temp['invoice_no'] = $stock->invoice_no;
         $temp['qty'] = $stock->qty;
-        $balance += $stock->qty;
+        $balance -= $stock->qty;
       }
 
       if(count($stocks) == 0) {
@@ -116,7 +116,7 @@ class ReportsController extends Controller
               array_push($keys, $product_category->name . ' Qty. Manu. (in Kgs)');
             }
             $temp[$product_category->name . ' Qty. Manu.'] = $stock_category1->pivot->value * $qty;
-            $balance -= $stock_category1->pivot->value * $qty; 
+            $balance += $stock_category1->pivot->value * $qty; 
             // dd($stock_category->pivot->value * $qty);
           }
         }
