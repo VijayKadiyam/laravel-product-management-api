@@ -8,6 +8,7 @@ use App\Product;
 use App\Setting;
 use App\Customer;
 use Carbon\Carbon;
+use App\ProductCategory;
 use Illuminate\Http\Request;
 
 class ReportsController extends Controller
@@ -55,23 +56,25 @@ class ReportsController extends Controller
     $fromDate = '';
     $toDate = '';
     if($request->fromDate) {
-      $fromDate = new Carbon($request->fromDate);
+      $fromDate = new Carbon($request->toDate);
     } 
     else {
       return "Please select from date";
     }
 
     if($request->toDate)
-      $toDate = (new Carbon($request->toDate));  
+      $toDate = (new Carbon($request->fromDate));  
     else {
       return "Please select to date";
     }
 
     $data = [];
     $keys = [
-      'Date', 'Supplier Name', 'Invoice No', 'Qty'
+      'Date', 'Supplier Name', 'Invoice No', 'Qty Received'
     ];
-    while($fromDate <= $toDate) {
+    $balance = $stock_category->quantity_left;
+    while($fromDate >= $toDate) {
+      // Get the stocks for a particular date
       $stocks = Stock::where('date', '=', $fromDate->format('d-m-Y'))
         ->where('stock_category_id', '=', $request->stock_category_id)
         ->with('supplier')
@@ -83,13 +86,61 @@ class ReportsController extends Controller
         $temp['supplier_name'] = $stock->supplier->name;
         $temp['invoice_no'] = $stock->invoice_no;
         $temp['qty'] = $stock->qty;
+        $balance += $stock->qty;
       }
-      array_push($data, $temp);
-      $fromDate->addDays(1);
-    }
-    // $keys = array_keys($temp);
 
-    return view('reports.stock-report', compact('data', 'keys', 'stock_category', 'fromDate', 'toDate'));
+      if(count($stocks) == 0) {
+        $temp['date'] = 0;
+        $temp['supplier_name'] = 0;
+        $temp['invoice_no'] = 0;
+        $temp['qty'] = 0;
+      }
+
+      // Get the production for a particular date
+      $product_categories = ProductCategory::all();
+      foreach($product_categories as $product_category) {
+        $products = Product::whereDate('created_at', '=', $fromDate->format('Y-m-d'))
+          ->where('product_category_id', '=', $product_category->id)
+          ->get();
+
+        $qty = 0;
+        foreach($products as $product) {
+          $qty += $product->qty;
+        }
+
+        foreach($product_category->stock_categories as $stock_category) {
+          if($stock_category->id == $request->stock_category_id) { 
+            if(!in_array($product_category->name . ' Qty. Manu. (in Kgs)' , $keys)) {
+              array_push($keys, $product_category->name . ' Qty. Manu. (in Kgs)');
+            }
+            $temp[$product_category->name . ' Qty. Manu.'] = $stock_category->pivot->value * $qty;
+            $balance -= $stock_category->pivot->value * $qty; 
+            // dd($stock_category->pivot->value * $qty);
+          }
+        }
+      } 
+
+      $temp['balance'] = $balance;
+
+      array_push($data, $temp);
+      $fromDate->subDays(1);
+    }
+
+    $opening_balance = $temp['balance'];
+
+    array_push($keys, 'Balance (in Kgs)');
+
+    // To get back the from date
+    if($request->fromDate) {
+      $fromDate = new Carbon($request->fromDate);
+    } 
+
+    // To get back the from date
+    if($request->toDate) {
+      $toDate = new Carbon($request->toDate);
+    } 
+
+    return view('reports.stock-report', compact('data', 'keys', 'stock_category', 'fromDate', 'toDate', 'opening_balance'));
 
   }
 
@@ -123,7 +174,9 @@ class ReportsController extends Controller
     $data = [];
     $total = 0;
     while($fromDate <= $toDate) {
-      $products = Product::whereDate('created_at', '=', $fromDate->format('Y-m-d'))->get();
+      $products = Product::whereDate('created_at', '=', $fromDate->format('Y-m-d'))
+        ->where('product_category_id', '=', $request->product_category_id)
+        ->get();
 
       $qty = 0;
       foreach($products as $product) {

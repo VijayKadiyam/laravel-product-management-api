@@ -66,7 +66,7 @@
 </style>
 
 <!-- Bill Heading -->
-<h3 align="center">{{ $stock_category->name }} between {{ $fromDate->format('d-m-Y') }} - {{ $toDate->format('d-m-Y') }}</h3>
+<h3 align="center">{{ $stock_category->name }} between {{ $fromDate->format('d-m-Y') }} - {{ $toDate->format('d-m-Y') }} (Opening Balance: {{ $opening_balance }})</h3>
 
 <table>  
   <tr align="center">
