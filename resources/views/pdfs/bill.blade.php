@@ -6,6 +6,38 @@
   // TO get the first letters
   preg_match_all('/\b\w/', $bill->company->name, $matches); 
 
+  function getIndianCurrency(float $number)
+  {
+    $decimal = round($number - ($no = floor($number)), 2) * 100;
+    $hundred = null;
+    $digits_length = strlen($no);
+    $i = 0;
+    $str = array();
+    $words = array(0 => '', 1 => 'One', 2 => 'Two',
+        3 => 'Three', 4 => 'Four', 5 => 'Five', 6 => 'Six',
+        7 => 'Seven', 8 => 'Eight', 9 => 'Nine',
+        10 => 'Ten', 11 => 'Eleven', 12 => 'Twelve',
+        13 => 'Thirteen', 14 => 'Fourteen', 15 => 'Fifteen',
+        16 => 'Sixteen', 17 => 'Seventeen', 18 => 'Eighteen',
+        19 => 'Nineteen', 20 => 'Twenty', 30 => 'Thirty',
+        40 => 'Forty', 50 => 'Fifty', 60 => 'Sixty',
+        70 => 'Seventy', 80 => 'Eighty', 90 => 'Ninety');
+    $digits = array('', 'Hundred','Thousand','Lakh', 'Crore');
+    while( $i < $digits_length ) {
+        $divider = ($i == 2) ? 10 : 100;
+        $number = floor($no % $divider);
+        $no = floor($no / $divider);
+        $i += $divider == 10 ? 1 : 2;
+        if ($number) {
+            $plural = (($counter = count($str)) && $number > 9) ? 's' : null;
+            $hundred = ($counter == 1 && $str[0]) ? ' and ' : null;
+            $str [] = ($number < 21) ? $words[$number].' '. $digits[$counter]. $plural.' '.$hundred:$words[floor($number / 10) * 10].' '.$words[$number % 10]. ' '.$digits[$counter].$plural.' '.$hundred;
+        } else $str[] = null;
+    }
+    $Rupees = implode('', array_reverse($str));
+    $paise = ($decimal) ? " and" . ($words[$decimal / 10] . " " . $words[$decimal % 10]) . ' Paise' : '';
+    return ($Rupees ? $Rupees . 'Rupees Only' : '') . $paise;
+  }
 ?>
 
 <!DOCTYPE html>
@@ -14,7 +46,7 @@
 
   <head>
 
-    <title>{{ $settings->bill_format }}{{ $bill->bill_no }}</title>
+    <title>{{ $settings->bill_format }}{{ $bill->bill_no }}/18-19</title>
 
     <!-- Style-->
     <style type="text/css">
@@ -95,7 +127,7 @@
     <h3 align="center">TAX INVOICE</h3>
 
     <!-- Basic Details -->
-    <div class="wrapper"> 
+    <div class="wrapper" style="border: 0.1px solid black; border-bottom: 0"> 
 
       <div class="div-inline">
 
@@ -139,7 +171,7 @@
 
           <!-- Buyer Name and Address-->
           <tr>
-            <td>
+            <td style="border-bottom: 0">
               Buyer (if other than consignee)
               <br>
               <b>{{ $bill->customer->name }}</b>
@@ -169,7 +201,7 @@
             <td>
               Invoice No
               <br>
-              <b>{{ $settings->bill_format }}{{ $bill->bill_no }}</b>
+              <b>{{ $settings->bill_format }}{{ $bill->bill_no }}/18-19</b>
             </td>
             <td>
               Invoice Date
@@ -244,7 +276,7 @@
           </tr>
 
           <tr>
-            <td colspan="2">
+            <td colspan="2" rowspan="5">
               Terms of delivery
               <br>
               <b>{{ $bill->terms_of_delivery }}</b>
@@ -313,7 +345,7 @@
 
             <!-- Cose per unit -->
             <td>
-              Rs. {{ $billing_detail->amount / $billing_detail->qty }}
+              Rs. {{ number_format($billing_detail->amount / $billing_detail->qty, 2, '.', '') }}
             </td>
 
             <!-- Rate per bag -->
@@ -323,7 +355,7 @@
 
             <!-- Amount -->
             <td>
-              Rs. {{ number_format($billing_detail->amount) }}
+              Rs. {{ number_format($billing_detail->amount, 2, '.', '') }}
             </td>
 
         </tr>
@@ -335,13 +367,13 @@
           <td colspan="3" align="right" >
             @if($bill->customer->state_code == $bill->company->state_code)
               @foreach($bill->billing_taxes as $billing_tax)
-                <b>SGST Tax @ {{ $billing_tax->tax->tax_percent/2 }}%</b>
+                <b>Output SGST {{ $billing_tax->tax->tax_percent/2 }}%</b>
                 <br>
-                <b>CGST Tax @ {{ $billing_tax->tax->tax_percent/2 }}%</b>
+                <b>Output CGST {{ $billing_tax->tax->tax_percent/2 }}%</b>
               @endforeach
             @else
               @foreach($bill->billing_taxes as $billing_tax)
-                <b>IGST Tax @ {{ $billing_tax->tax->tax_percent }}%</b>
+                <b>Output IGST {{ $billing_tax->tax->tax_percent }}%</b>
               @endforeach
             @endif
           </td>
@@ -352,13 +384,13 @@
           <td align="center">
             @if($bill->customer->state_code == $bill->company->state_code)
               @foreach($bill->billing_taxes as $billing_tax)
-                <b>{{ number_format($billing_tax->amount/2) }}%</b>
+                <b>Rs. {{ number_format($billing_tax->amount/2, 2, '.', '') }}</b>
                 <br>
-                <b>{{ number_format($billing_tax->amount/2) }}%</b>
+                <b>Rs. {{ number_format($billing_tax->amount/2, 2, '.', '') }}</b>
               @endforeach
             @else
               @foreach($bill->billing_taxes as $billing_tax)
-                <b>{{ number_format( $billing_tax->amount ) }}%</b>
+                <b>Rs. {{ number_format( $billing_tax->amount, 2, '.', '' ) }}</b>
               @endforeach
             @endif
           </td>
@@ -380,7 +412,7 @@
               <?php $total_tax += $billing_tax->amount ?>
             @endforeach
             <?php $total = $bill->sub_total + $total_tax ?>
-            Rs. {{ number_format( $total ) }}
+            Rs. {{ number_format( $total, 2, '.', '') }}
           </td>
         </tr>
 
@@ -389,27 +421,53 @@
           <td colspan="9">
             Amount Chargeable (in words)
             <br>
-            <b>{Total amount in words}</b>
+            <b>{{ getIndianCurrency($total) }}</b>
           </td>
         </tr>
 
         <!-- Taxable amount -->
         <tr align="center">
-          <td colspan="5">
+          @if($bill->customer->state_code == $bill->company->state_code)
+            <td colspan="3"  rowspan="2">
+          @else
+            <td colspan="5" rowspan="2">
+          @endif
             HSN/SAC
           </td>
-          <td>
+          <td rowspan="2">
             Taxable Value
           </td>
+          @if($bill->customer->state_code == $bill->company->state_code)
+            <td colspan="2">
+              CGST Tax
+            </td>
+            <td colspan="2">
+              SGST Tax
+            </td>
+          @else
+            <td colspan="2">
+              Integrated Tax
+            </td>
+          @endif
+          <td rowspan="2">
+            Total Tax Amount
+          </td>
+        </tr>
+        <tr align="center">
           <td>
             Rate
           </td>
           <td>
             Amount
           </td>
-          <td>
-            Total Tax Amount
-          </td>
+          @if($bill->customer->state_code == $bill->company->state_code)
+            <td>
+              Rate
+            </td>
+            <td>
+              Amount
+            </td>
+          @endif
         </tr>
 
         <!-- Billing details -->
@@ -421,7 +479,11 @@
         <tr align="center">  
 
           <!-- HSN Code -->
-          <td colspan="5">
+          @if($bill->customer->state_code == $bill->company->state_code)
+            <td colspan="3">
+          @else
+            <td colspan="5">
+          @endif
             {{ $billing_detail->product_category->hsn_code }}
           </td> 
 
@@ -430,31 +492,47 @@
             <?php  
               $total_taxable += $billing_detail->amount;
             ?>
-            Rs. {{ number_format($billing_detail->amount) }}
+            Rs. {{ number_format($billing_detail->amount, 2, '.', '') }}
           </td>
 
           <!-- Rate -->
-          <td>
+          <!-- Tax amount --> 
+          <?php 
+            $tax = 0;
+            foreach($bill->billing_taxes as $billing_tax) {
+              $tax = $billing_detail->amount * $billing_tax->tax->tax_percent / 100;
+              $total_tax += $tax;
+            }
+          ?>
+          @if($bill->customer->state_code == $bill->company->state_code)
             @foreach($bill->billing_taxes as $billing_tax)
-             {{ $billing_tax->tax->tax_percent }} %
+            <td>
+              {{ $billing_tax->tax->tax_percent/2 }} %
+            </td>
+            <td>
+              Rs. {{ number_format($billing_tax->amount/2, 2, '.', '') }}</b>
+            </td>
+            <td>
+              {{ $billing_tax->tax->tax_percent/2 }} %
+            </td>
+            <td>
+              Rs. {{ number_format($billing_tax->amount/2, 2, '.', '') }}</b>
+            </td>
             @endforeach
-          </td>
-
-          <!-- Tax amount -->
-          <td>
-            <?php 
-              $tax = 0;
-              foreach($bill->billing_taxes as $billing_tax) {
-                $tax = $billing_detail->amount * $billing_tax->tax->tax_percent / 100;
-                $total_tax += $tax;
-              }
-            ?>
-            Rs. {{ number_format( $tax ) }}
-          </td>
+          @else
+            @foreach($bill->billing_taxes as $billing_tax)
+              <td>
+                {{ $billing_tax->tax->tax_percent }} %
+              </td>
+              <td>
+                Rs. {{ number_format($billing_tax->amount, 2, '.', '') }}</b>
+              </td>
+            @endforeach
+          @endif 
 
           <!-- Total tax amount -->
           <td> 
-            Rs. {{ number_format( $tax ) }}
+            Rs. {{ number_format( $tax, 2, '.', '' ) }}
           </td>
 
         </tr>
@@ -465,19 +543,19 @@
             <b>Total</b>
           </td>
           <td align="center">
-            <b>Rs. {{ number_format($total_taxable) }}</b>
+            <b>Rs. {{ number_format($total_taxable, 2, '.', '') }}</b>
           </td>
           <td></td>
           <td></td>
           <td align="center">
-            <b>Rs. {{ number_format($total_tax) }}</b>
+            <b>Rs. {{ number_format($total_tax, 2, '.', '') }}</b>
           </td>
         </tr>
 
         <!-- Total tax amount -->
         <tr>
           <td colspan="9">
-            Tax Chargeable (in words) : <b>{Tax amount in words}</b> 
+            Tax Chargeable (in words) : <b>{{ getIndianCurrency($total_tax) }}</b> 
           </td>
         </tr> 
 
