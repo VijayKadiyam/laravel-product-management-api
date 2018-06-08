@@ -320,6 +320,9 @@
         </tr>
 
         <!-- Billing details -->
+        <?php 
+          $total_bags = 0;
+         ?>
         @foreach($bill->billing_details as $billing_detail)
         <tr align="center" class="noBottomBorder"> 
 
@@ -341,11 +344,14 @@
             <!-- Quantity -->
             <td>
               {{ $billing_detail->qty }} Bag
+              <?php 
+                $total_bags += $billing_detail->qty;
+               ?>
             </td>
 
             <!-- Cose per unit -->
             <td>
-              Rs. {{ number_format($billing_detail->amount / $billing_detail->qty, 2, '.', '') }}
+              {{ number_format($billing_detail->amount / $billing_detail->qty, 2, '.', '') }}
             </td>
 
             <!-- Rate per bag -->
@@ -355,7 +361,7 @@
 
             <!-- Amount -->
             <td>
-              Rs. {{ number_format($billing_detail->amount, 2, '.', '') }}
+              {{ number_format($billing_detail->amount, 2, '.', '') }}
             </td>
 
         </tr>
@@ -384,13 +390,13 @@
           <td align="center">
             @if($bill->customer->state_code == $bill->company->state_code)
               @foreach($bill->billing_taxes as $billing_tax)
-                <b>Rs. {{ number_format($billing_tax->amount/2, 2, '.', '') }}</b>
+                <b>{{ number_format($billing_tax->amount/2, 2, '.', '') }}</b>
                 <br>
-                <b>Rs. {{ number_format($billing_tax->amount/2, 2, '.', '') }}</b>
+                <b>{{ number_format($billing_tax->amount/2, 2, '.', '') }}</b>
               @endforeach
             @else
               @foreach($bill->billing_taxes as $billing_tax)
-                <b>Rs. {{ number_format( $billing_tax->amount, 2, '.', '' ) }}</b>
+                <b>{{ number_format( $billing_tax->amount, 2, '.', '' ) }}</b>
               @endforeach
             @endif
           </td>
@@ -403,7 +409,9 @@
             Total
           </td>
           <td></td>
-          <td></td>
+          <td align="center">
+            <b>{{ $total_bags }} Bags</b>
+          </td>
           <td></td>
           <td></td>
           <td align="center">
@@ -412,7 +420,7 @@
               <?php $total_tax += $billing_tax->amount ?>
             @endforeach
             <?php $total = $bill->sub_total + $total_tax ?>
-            Rs. {{ number_format( $total, 2, '.', '') }}
+            <b>Rs. {{ number_format( $total, 2, '.', '') }}</b>
           </td>
         </tr>
 
@@ -492,7 +500,7 @@
             <?php  
               $total_taxable += $billing_detail->amount;
             ?>
-            Rs. {{ number_format($billing_detail->amount, 2, '.', '') }}
+            {{ number_format($billing_detail->amount, 2, '.', '') }}
           </td>
 
           <!-- Rate -->
@@ -510,13 +518,13 @@
               {{ $billing_tax->tax->tax_percent/2 }} %
             </td>
             <td>
-              Rs. {{ number_format($billing_tax->amount/2, 2, '.', '') }}</b>
+              {{ number_format($billing_tax->amount/2, 2, '.', '') }}</b>
             </td>
             <td>
               {{ $billing_tax->tax->tax_percent/2 }} %
             </td>
             <td>
-              Rs. {{ number_format($billing_tax->amount/2, 2, '.', '') }}</b>
+              {{ number_format($billing_tax->amount/2, 2, '.', '') }}</b>
             </td>
             @endforeach
           @else
@@ -525,14 +533,14 @@
                 {{ $billing_tax->tax->tax_percent }} %
               </td>
               <td>
-                Rs. {{ number_format($billing_tax->amount, 2, '.', '') }}</b>
+                {{ number_format($billing_tax->amount, 2, '.', '') }}</b>
               </td>
             @endforeach
           @endif 
 
           <!-- Total tax amount -->
           <td> 
-            Rs. {{ number_format( $tax, 2, '.', '' ) }}
+            {{ number_format( $tax, 2, '.', '' ) }}
           </td>
 
         </tr>
@@ -543,12 +551,12 @@
             <b>Total</b>
           </td>
           <td align="center">
-            <b>Rs. {{ number_format($total_taxable, 2, '.', '') }}</b>
+            <b>{{ number_format($total_taxable, 2, '.', '') }}</b>
           </td>
           <td></td>
           <td></td>
           <td align="center">
-            <b>Rs. {{ number_format($total_tax, 2, '.', '') }}</b>
+            <b>{{ number_format($total_tax, 2, '.', '') }}</b>
           </td>
         </tr>
 

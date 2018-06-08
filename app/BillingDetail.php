@@ -27,6 +27,7 @@ class BillingDetail extends Model
    */
   public function product_category()
   {
-    return $this->belongsTo(ProductCategory::class);
+    return $this->belongsTo(ProductCategory::class)
+      ->with('stock_categories');
   }
 }

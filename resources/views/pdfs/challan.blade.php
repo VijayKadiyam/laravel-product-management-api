@@ -93,7 +93,7 @@
     <!-- Bill Heading -->
     <h3 align="center">DELIVERY CHALLAN</h3>
 
-    <h3 align="right">Mobile No. : { Insert this filed in companies table }</h3>
+    <!-- <h3 align="right">Mobile No. : { Insert this filed in companies table }</h3> -->
 
     <div class="wrapper">
       <table> 
@@ -123,7 +123,7 @@
 
           <!-- Customer Name and Address-->
           <tr>
-            <td rowspan="3" colspan="2">
+            <td rowspan="4" colspan="2">
               <b>{{ $bill->customer->name }}</b>
               <br>
               {{ $bill->customer->address }}
@@ -160,6 +160,16 @@
             </td>
           </tr> 
 
+          <!-- Destination -->
+          <tr>
+            <td>
+              <b>Destination :</b>
+            </td>
+            <td>
+              {{ $bill->destination }}
+            </td>
+          </tr> 
+
         </table> 
         
       </div> 
@@ -192,10 +202,10 @@
 
         <!-- Billing details -->
         @foreach($bill->billing_details as $billing_detail)
-        <tr align="center" class="noBottomBorder"> 
+        <tr align="center" class="noBottomBorder" style="height: 200px;"> 
 
             <!-- Sr. No -->
-            <td style="height:40px;" class="align-top">
+            <td style="height:40px;">
               {{ $loop->index + 1 }}
             </td>
 
@@ -211,7 +221,11 @@
 
             <!-- Weight -->
             <td>
-              { Add total weight }
+              <?php $quantity = 0; ?>
+              @foreach($billing_detail->product_category->stock_categories as $stock_category)
+                <?php $quantity += $stock_category->pivot->value; ?>
+              @endforeach
+              {{ $quantity * $billing_detail->qty }} Kgs
             </td>
 
             <!-- Remarks -->
